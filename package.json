@@ -1,0 +1,13 @@
+{
+	"name": "vault",
+	"version": "1.0.0",
+	"description": "Simple cli tool to save your secret stuff",
+	"main": "index.js",
+	"preferGlobal": true,
+	"bin": "./index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "MIT"
+}
