@@ -23,17 +23,17 @@ let customVault = decrypt(customVaultFile, key, iv);
 const vaultFilePath = customVault || path.join(homedir(), 'vault');
 const vaultFile = path.join(vaultFilePath, fs.existsSync(vaultFilePath) && fs.lstatSync(vaultFilePath).isDirectory() ? 'vault' : '');
 
-if (!exists) fs.unlinkSync(vaultFile);
-if (!fs.existsSync(vaultFile)) fs.writeFileSync(vaultFile, '');
-
 async function load() {
+	if (!exists) fs.unlinkSync(vaultFile);
+	if (!fs.existsSync(vaultFile)) fs.writeFileSync(vaultFile, '');
+
 	let data = {};
 	try {
 		data = JSON.parse(decrypt(fs.readFileSync(vaultFile, 'utf-8'), key, iv)) || {};
 	} catch {
 		//
 	}
-	return { data, exists, master };
+	return data;
 }
 
 function save(data, path = vaultFile) {
@@ -41,7 +41,7 @@ function save(data, path = vaultFile) {
 }
 
 async function saveData(path, afterLoad) {
-	return load().then(({ data }) => {
+	return load().then((data) => {
 		afterLoad && afterLoad();
 		save(data, path);
 	});
@@ -78,4 +78,4 @@ function clearVault() {
 	fs.unlinkSync(vaultFile);
 }
 
-module.exports = { load, save, changePath, changePassword, clearVault, vaultFile };
+module.exports = { load, save, changePath, changePassword, clearVault, vaultFile, exists, master };

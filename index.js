@@ -3,33 +3,45 @@ const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
 const { hash } = require('./utils/encryption');
-const { load, save, changePath, changePassword, vaultFile, clearVault } = require('./utils/files');
+const { load, save, changePath, changePassword, vaultFile, clearVault, exists, master } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
-load().then(({ data, exists, master }) => {
-	const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
-	const configChoices = ['path', 'password'];
+const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
+const configChoices = ['path', 'password'];
 
-	program
-		.version('1.0.0')
-		.description('Simple cli tool to save your secret stuff')
-		.addArgument(new Argument('<action>', 'action you want to perform').choices(actionChoices))
-		.argument('[name]', 'entry name')
-		.argument('[config]', 'config arguments')
-		.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))
-		.action((action, name, config) => {
-			if (action == 'config' && !configChoices.includes(name))
-				return console.log(
-					`invalid config option (choices: ${configChoices
-						.map(e => `"${e}"`)
-						.join(', ')
-						.trim()})`
-				);
-			runAction(action, name, exists, config);
-		})
-		.parse();
+program
+	.version('1.0.0')
+	.description('Simple cli tool to save your secret stuff')
+	.addArgument(new Argument('<action>', 'action you want to perform').choices(actionChoices))
+	.argument('[name]', 'entry name')
+	.argument('[config]', 'config arguments')
+	.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))
+	.action((action, name, config) => {
+		if (action == 'config' && !configChoices.includes(name))
+			return console.log(
+				`invalid config option (choices: ${configChoices
+					.map(e => `"${e}"`)
+					.join(', ')
+					.trim()})`
+			);
+		runAction(action, name, config);
+	})
+	.parse();
 
-	function run(action, name, type = 'text', config) {
+function runAction(action, name, config) {
+	let password = '';
+	if (exists) password = prompt('password: ', { echo: '*' });
+
+	if (!exists || hash(password) == master) {
+		run(action, name, program.opts().type, config);
+	} else {
+		console.log('wrong password');
+		runAction(action, name, config);
+	}
+}
+
+function run(action, name, type = 'text', config) {
+	load().then(data => {
 		switch (action) {
 			case 'add': {
 				if (!name) return console.log("argument 'name' is required");
@@ -119,17 +131,5 @@ load().then(({ data, exists, master }) => {
 				break;
 			}
 		}
-	}
-
-	function runAction(action, name, exists, config) {
-		let password = '';
-		if (exists) password = prompt('password: ', { echo: '*' });
-
-		if (!exists || hash(password) == master) {
-			run(action, name, program.opts().type, config);
-		} else {
-			console.log('wrong password');
-			runAction(action, name, exists);
-		}
-	}
-});
+	});
+}
