@@ -3,11 +3,11 @@ const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
 const { hash } = require('./utils/encryption');
-const { load, save, changePath, changePassword } = require('./utils/files');
+const { load, save, changePath, changePassword, vaultFile } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 load().then(({ data, exists, master }) => {
-	const actionChoices = ['add', 'remove', 'view', 'config', 'list'];
+	const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path'];
 	const configChoices = ['path', 'password'];
 
 	program
@@ -94,6 +94,8 @@ load().then(({ data, exists, master }) => {
 				const keys = Object.keys(data);
 				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
 				console.log('empty');
+			case 'path':
+				console.log('current path:', vaultFile);
 		}
 	}
 
