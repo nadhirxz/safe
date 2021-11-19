@@ -102,6 +102,7 @@ function run(action, name, type = 'text', config) {
 						break;
 					case 'password':
 						changePassword(prompt('new password: '));
+						console.log('password changed');
 						break;
 				}
 				break;
@@ -110,7 +111,7 @@ function run(action, name, type = 'text', config) {
 			case 'list': {
 				const keys = Object.keys(data);
 				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
-				console.log('empty');
+				console.log('vault is empty');
 				break;
 			}
 

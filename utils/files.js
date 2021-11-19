@@ -41,7 +41,7 @@ function save(data, path = vaultFile) {
 }
 
 async function saveData(path, afterLoad) {
-	return load().then((data) => {
+	return load().then(data => {
 		afterLoad && afterLoad();
 		save(data, path);
 	});
@@ -53,7 +53,7 @@ function saveConfig({ masterPassword = master, path = vaultFilePath }) {
 
 function changePath(newPath) {
 	newPath = path.join(newPath, fs.existsSync(newPath) && fs.lstatSync(newPath).isDirectory() ? 'vault' : '');
-	const log = () => console.log(`vault is now located at ${newPath}`);
+	const log = () => console.log(`new vault path: ${newPath}`);
 
 	if (newPath.toLowerCase() != vaultFile.toLowerCase()) {
 		saveConfig({ path: newPath });
