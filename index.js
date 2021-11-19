@@ -31,7 +31,7 @@ load().then(({ data, exists, master }) => {
 
 	function run(action, name, type = 'text', config) {
 		switch (action) {
-			case 'add':
+			case 'add': {
 				if (!name) return console.log("argument 'name' is required");
 				if (data.hasOwnProperty(name)) return console.log('entry already exists');
 				if (type == 'account') {
@@ -45,8 +45,9 @@ load().then(({ data, exists, master }) => {
 				save(data);
 				console.log('entry added successfully');
 				break;
+			}
 
-			case 'remove':
+			case 'remove': {
 				if (!name) return console.log("argument 'name' is required");
 				if (data[name] == undefined) return console.log("entry doesn't exist");
 				let confirm = '';
@@ -59,8 +60,9 @@ load().then(({ data, exists, master }) => {
 					console.log('entry removed successfully');
 				}
 				break;
+			}
 
-			case 'view':
+			case 'view': {
 				if (!name) return console.log("argument 'name' is required");
 				if (data[name] == undefined) return console.log("entry doesn't exist");
 				if (typeof data[name] == 'object') {
@@ -70,8 +72,9 @@ load().then(({ data, exists, master }) => {
 					console.log(data[name]);
 				}
 				break;
+			}
 
-			case 'config':
+			case 'config': {
 				if (!name) return console.log("argument 'name' is required");
 				switch (name) {
 					case 'path':
@@ -90,12 +93,19 @@ load().then(({ data, exists, master }) => {
 						break;
 				}
 				break;
-			case 'list':
+			}
+
+			case 'list': {
 				const keys = Object.keys(data);
 				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
 				console.log('empty');
-			case 'path':
+				break;
+			}
+
+			case 'path': {
 				console.log('current path:', vaultFile);
+				break;
+			}
 		}
 	}
 
