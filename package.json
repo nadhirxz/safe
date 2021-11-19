@@ -13,6 +13,7 @@
 	"dependencies": {
 		"async-prompt": "^1.0.1",
 		"commander": "^8.3.0",
-		"prompt-sync": "^4.2.0"
+		"prompt-sync": "^4.2.0",
+		"utf-8-validate": "^5.0.7"
 	}
 }

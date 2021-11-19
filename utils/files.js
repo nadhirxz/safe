@@ -78,4 +78,14 @@ function clearVault() {
 	fs.unlinkSync(vaultFile);
 }
 
-module.exports = { load, save, changePath, changePassword, clearVault, vaultFile, exists, master };
+function checkFile(filename) {
+	const valid = fs.existsSync(filename) && fs.lstatSync(filename).isFile();
+	return { valid, file: valid ? fs.readFileSync(filename) : null };
+}
+
+function exportFile(filename, buffer) {
+	fs.writeFileSync(filename, buffer);
+	console.log('entry exported to', filename);
+}
+
+module.exports = { load, save, changePath, changePassword, clearVault, checkFile, exportFile, vaultFile, exists, master };
