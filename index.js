@@ -90,11 +90,9 @@ load().then(({ config, data, exists }) => {
 				}
 				break;
 			case 'list':
-				console.log(
-					Object.keys(data)
-						.map(e => ` - ${e}`)
-						.join(os.EOL)
-				);
+				const keys = Object.keys(data);
+				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
+				console.log('empty');
 		}
 	}
 
