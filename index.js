@@ -18,7 +18,6 @@ load().then(({ config, data, exists }) => {
 		.argument('[config]', 'config arguments')
 		.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))
 		.action((action, name, config) => {
-			if (action == 'add' && data.hasOwnProperty(name)) return console.log('This entry already exists');
 			if (action == 'config' && !configChoices.includes(name))
 				return console.log(
 					`invalid config option (choices: ${configChoices
@@ -33,6 +32,7 @@ load().then(({ config, data, exists }) => {
 	function run(action, name, type = 'text', config) {
 		switch (action) {
 			case 'add':
+				if (data.hasOwnProperty(name)) return console.log('This entry already exists');
 				if (type == 'account') {
 					const username = prompt('Enter a username/email: ');
 					const password = prompt('Enter a password: ', { echo: '*' });
