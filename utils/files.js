@@ -53,7 +53,7 @@ function saveConfig({ masterPassword = master, path = vaultFilePath }) {
 
 function changePath(newPath) {
 	newPath = path.join(newPath, fs.existsSync(newPath) && fs.lstatSync(newPath).isDirectory() ? 'vault' : '');
-	const log = () => console.log(`Vault is now located at ${newPath}`);
+	const log = () => console.log(`vault is now located at ${newPath}`);
 
 	if (newPath.toLowerCase() != vaultFile.toLowerCase()) {
 		saveConfig({ path: newPath });

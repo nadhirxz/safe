@@ -33,38 +33,39 @@ load().then(({ config, data, exists }) => {
 		switch (action) {
 			case 'add':
 				if (!name) return console.log("argument 'name' is required");
-				if (data.hasOwnProperty(name)) return console.log('This entry already exists');
+				if (data.hasOwnProperty(name)) return console.log('entry already exists');
 				if (type == 'account') {
-					const username = prompt('Enter a username/email: ');
-					const password = prompt('Enter a password: ', { echo: '*' });
+					const username = prompt('username/email: ');
+					const password = prompt('password: ', { echo: '*' });
 					data[name] = { username, password };
 				} else {
-					const text = prompt('Enter your text: ');
+					const text = prompt('your text: ');
 					data[name] = text;
 				}
 				save(data);
+				console.log('entry added successfully');
 				break;
 
 			case 'remove':
 				if (!name) return console.log("argument 'name' is required");
-				if (data[name] == undefined) return console.log("This entry doesn't exist");
+				if (data[name] == undefined) return console.log("entry doesn't exist");
 				let confirm = '';
 				while (!['y', 'n'].includes(confirm.toLowerCase())) {
-					confirm = prompt(`Are you sure you want to remove "${name}" ? (Y/N): `);
+					confirm = prompt(`are you sure you want to remove "${name}" ? (Y/N): `);
 				}
 				if (confirm.toLowerCase() == 'y') {
 					delete data[name];
 					save(data);
-					console.log(`"${name}" removed successfully`);
+					console.log('entry removed successfully');
 				}
 				break;
 
 			case 'view':
 				if (!name) return console.log("argument 'name' is required");
-				if (data[name] == undefined) return console.log("This entry doesn't exist");
+				if (data[name] == undefined) return console.log("entry doesn't exist");
 				if (typeof data[name] == 'object') {
-					console.log('User:', data[name].username);
-					console.log('Password:', data[name].password);
+					console.log('username/email:', data[name].username);
+					console.log('password:', data[name].password);
 				} else {
 					console.log(data[name]);
 				}
@@ -85,7 +86,7 @@ load().then(({ config, data, exists }) => {
 						changePath(providedPath);
 						break;
 					case 'password':
-						changePassword(prompt('Enter a new password: '));
+						changePassword(prompt('new password: '));
 						break;
 				}
 				break;
@@ -98,12 +99,12 @@ load().then(({ config, data, exists }) => {
 
 	function runAction(action, name, exists, config) {
 		let password = '';
-		if (exists) password = prompt('Enter your master password: ', { echo: '*' });
+		if (exists) password = prompt('password: ', { echo: '*' });
 
 		if (!exists || hash(password) == master) {
 			run(action, name, program.opts().type, config);
 		} else {
-			console.log('Wrong password');
+			console.log('wrong password');
 			runAction(action, name, exists);
 		}
 	}
