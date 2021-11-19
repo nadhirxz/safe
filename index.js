@@ -6,14 +6,14 @@ const { hash } = require('./utils/encryption');
 const { load, save, changePath, changePassword } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
-load().then(({ config, data, exists }) => {
-	const [master, key] = config.split(os.EOL);
+load().then(({ data, exists, master }) => {
+	const actionChoices = ['add', 'remove', 'view', 'config', 'list'];
 	const configChoices = ['path', 'password'];
 
 	program
 		.version('1.0.0')
 		.description('Simple cli tool to save your secret stuff')
-		.addArgument(new Argument('<action>', 'action you want to perform').choices(['add', 'remove', 'view', 'config', 'list']))
+		.addArgument(new Argument('<action>', 'action you want to perform').choices(actionChoices))
 		.argument('[name]', 'entry name')
 		.argument('[config]', 'config arguments')
 		.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))

@@ -33,7 +33,7 @@ async function load() {
 	} catch {
 		//
 	}
-	return { config, data, exists };
+	return { data, exists, master };
 }
 
 function save(data, path = vaultFile) {
@@ -74,4 +74,4 @@ function changePassword(password) {
 	});
 }
 
-module.exports = { load, save, changePath, changePassword };
+module.exports = { load, save, changePath, changePassword, vaultFile };
