@@ -13,8 +13,8 @@ load().then(({ config, data, exists }) => {
 	program
 		.version('1.0.0')
 		.description('Simple cli tool to save your secret stuff')
-		.addArgument(new Argument('<action>', 'action you want to perform').choices(['add', 'remove', 'view', 'config']))
-		.argument('<name>', 'entry name')
+		.addArgument(new Argument('<action>', 'action you want to perform').choices(['add', 'remove', 'view', 'config', 'list']))
+		.argument('[name]', 'entry name')
 		.argument('[config]', 'config arguments')
 		.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))
 		.action((action, name, config) => {
@@ -32,6 +32,7 @@ load().then(({ config, data, exists }) => {
 	function run(action, name, type = 'text', config) {
 		switch (action) {
 			case 'add':
+				if (!name) return console.log("argument 'name' is required");
 				if (data.hasOwnProperty(name)) return console.log('This entry already exists');
 				if (type == 'account') {
 					const username = prompt('Enter a username/email: ');
@@ -45,6 +46,7 @@ load().then(({ config, data, exists }) => {
 				break;
 
 			case 'remove':
+				if (!name) return console.log("argument 'name' is required");
 				if (data[name] == undefined) return console.log("This entry doesn't exist");
 				let confirm = '';
 				while (!['y', 'n'].includes(confirm.toLowerCase())) {
@@ -58,6 +60,7 @@ load().then(({ config, data, exists }) => {
 				break;
 
 			case 'view':
+				if (!name) return console.log("argument 'name' is required");
 				if (data[name] == undefined) return console.log("This entry doesn't exist");
 				if (typeof data[name] == 'object') {
 					console.log('User:', data[name].username);
@@ -68,6 +71,7 @@ load().then(({ config, data, exists }) => {
 				break;
 
 			case 'config':
+				if (!name) return console.log("argument 'name' is required");
 				switch (name) {
 					case 'path':
 						let providedPath = config;
@@ -85,6 +89,12 @@ load().then(({ config, data, exists }) => {
 						break;
 				}
 				break;
+			case 'list':
+				console.log(
+					Object.keys(data)
+						.map(e => ` - ${e}`)
+						.join(os.EOL)
+				);
 		}
 	}
 
