@@ -15,13 +15,15 @@ if (!exists) {
 }
 
 const config = fs.readFileSync(configFile, 'utf-8');
-const [master, enc, customVaultFile] = config.split(EOL);
-const [iv, key] = enc.split(':');
-const customVault = decrypt(customVaultFile, key, iv);
+let [master, customVaultFile] = config.split(EOL);
+let masterHash = hash(master, 'sha512', hash(master, 'md5'));
+let [iv, key] = [masterHash.slice(0, 16), masterHash.slice(16, 48)];
+let customVault = decrypt(customVaultFile, key, iv);
 
 const vaultFilePath = customVault || path.join(homedir(), 'vault');
 const vaultFile = path.join(vaultFilePath, fs.existsSync(vaultFilePath) && fs.lstatSync(vaultFilePath).isDirectory() ? 'vault' : '');
 
+if (!exists) fs.unlinkSync(vaultFile);
 if (!fs.existsSync(vaultFile)) fs.writeFileSync(vaultFile, '');
 
 async function load() {
@@ -38,8 +40,15 @@ function save(data, path = vaultFile) {
 	fs.writeFileSync(path, encrypt(JSON.stringify(data), key, iv));
 }
 
-function saveConfig({ masterPassword = master, encKey = enc, path = vaultFilePath }) {
-	fs.writeFileSync(configFile, masterPassword + EOL + encKey + EOL + encrypt(path, key, iv));
+async function saveData(path, afterLoad) {
+	return load().then(({ data }) => {
+		afterLoad && afterLoad();
+		save(data, path);
+	});
+}
+
+function saveConfig({ masterPassword = master, path = vaultFilePath }) {
+	fs.writeFileSync(configFile, masterPassword + EOL + encrypt(path, key, iv));
 }
 
 function changePath(newPath) {
@@ -48,18 +57,21 @@ function changePath(newPath) {
 
 	if (newPath.toLowerCase() != vaultFile.toLowerCase()) {
 		saveConfig({ path: newPath });
-		return load()
-			.then(({ data }) => save(data, newPath))
-			.then(() => {
-				fs.unlinkSync(vaultFile);
-				log();
-			});
+		return saveData(newPath).then(() => {
+			fs.unlinkSync(vaultFile);
+			log();
+		});
 	}
 	log();
 }
 
 function changePassword(password) {
-	saveConfig({ masterPassword: hash(password) });
+	saveData(vaultFile, () => {
+		master = hash(password);
+		masterHash = hash(master, 'sha512', hash(master, 'md5'));
+		[iv, key] = [masterHash.slice(0, 16), masterHash.slice(16, 48)];
+		saveConfig({});
+	});
 }
 
 module.exports = { load, save, changePath, changePassword };

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
-function hash(text) {
-	return crypto.createHash('sha256').update(text).digest('hex');
+function hash(text, algorithm = 'sha256', salt = '') {
+	return salt ? crypto.pbkdf2Sync(text, salt, 200, 24, algorithm).toString('hex') : crypto.createHash(algorithm).update(text).digest('hex');
 }
 
 function random(bytes) {
