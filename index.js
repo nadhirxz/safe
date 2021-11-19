@@ -3,11 +3,11 @@ const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
 const { hash } = require('./utils/encryption');
-const { load, save, changePath, changePassword, vaultFile } = require('./utils/files');
+const { load, save, changePath, changePassword, vaultFile, clearVault } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 load().then(({ data, exists, master }) => {
-	const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path'];
+	const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
 	const configChoices = ['path', 'password'];
 
 	program
@@ -104,6 +104,18 @@ load().then(({ data, exists, master }) => {
 
 			case 'path': {
 				console.log('current path:', vaultFile);
+				break;
+			}
+
+			case 'clear': {
+				let confirm = '';
+				while (!['y', 'n'].includes(confirm.toLowerCase())) {
+					confirm = prompt(`are you sure you want to clear the vault ? (Y/N): `);
+				}
+				if (confirm.toLowerCase() == 'y') {
+					clearVault();
+					console.log('vault cleared successfully');
+				}
 				break;
 			}
 		}

@@ -74,4 +74,8 @@ function changePassword(password) {
 	});
 }
 
-module.exports = { load, save, changePath, changePassword, vaultFile };
+function clearVault() {
+	fs.unlinkSync(vaultFile);
+}
+
+module.exports = { load, save, changePath, changePassword, clearVault, vaultFile };
