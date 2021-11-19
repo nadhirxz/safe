@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { homedir, EOL } = require('os');
-const { hash, random, decrypt, encrypt } = require('./encryption');
+const { hash, decrypt, encrypt } = require('./encryption');
 
 const configFile = path.join(homedir(), 'vault-config');
 
@@ -10,7 +10,7 @@ const exists = fs.existsSync(configFile) && fs.statSync(configFile).size != 0;
 if (!exists) {
 	const prompt = require('prompt-sync')();
 	const password = prompt('Enter a master password: ', { echo: '*' });
-	const data = hash(password) + EOL + random(8) + ':' + random(16);
+	const data = hash(password) + EOL;
 	fs.writeFileSync(configFile, data);
 }
 

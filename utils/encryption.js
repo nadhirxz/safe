@@ -4,10 +4,6 @@ function hash(text, algorithm = 'sha256', salt = '') {
 	return salt ? crypto.pbkdf2Sync(text, salt, 200, 24, algorithm).toString('hex') : crypto.createHash(algorithm).update(text).digest('hex');
 }
 
-function random(bytes) {
-	return crypto.randomBytes(bytes).toString('hex');
-}
-
 function encrypt(val, key, iv) {
 	try {
 		let cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
@@ -29,4 +25,4 @@ function decrypt(val, key, iv) {
 	}
 }
 
-module.exports = { hash, random, encrypt, decrypt };
+module.exports = { hash, encrypt, decrypt };
