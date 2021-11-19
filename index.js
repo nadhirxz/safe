@@ -4,7 +4,7 @@ const os = require('os');
 const path = require('path');
 const { hash } = require('./utils/encryption');
 const { load, save, changePath } = require('./utils/files');
-const prompt = require('prompt-sync')();
+const prompt = require('prompt-sync')({ sigint: true });
 
 load().then(({ config, data, exists }) => {
 	const [master, key] = config.split(os.EOL);
@@ -45,6 +45,16 @@ load().then(({ config, data, exists }) => {
 				break;
 
 			case 'remove':
+				if (data[name] == undefined) return console.log("This entry doesn't exist");
+				let confirm = '';
+				while (!['y', 'n'].includes(confirm.toLowerCase())) {
+					confirm = prompt(`Are you sure you want to remove "${name}" ? (Y/N) `);
+				}
+				if (confirm.toLowerCase() == 'y') {
+					delete data[name];
+					save(data);
+					console.log(`"${name}" removed successfully`);
+				}
 				break;
 
 			case 'view':
