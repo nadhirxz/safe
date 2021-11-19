@@ -3,12 +3,12 @@ const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
 const { hash } = require('./utils/encryption');
-const { load, save, changePath } = require('./utils/files');
+const { load, save, changePath, changePassword } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 load().then(({ config, data, exists }) => {
 	const [master, key] = config.split(os.EOL);
-	const configChoices = ['path'];
+	const configChoices = ['path', 'password'];
 
 	program
 		.version('1.0.0')
@@ -48,7 +48,7 @@ load().then(({ config, data, exists }) => {
 				if (data[name] == undefined) return console.log("This entry doesn't exist");
 				let confirm = '';
 				while (!['y', 'n'].includes(confirm.toLowerCase())) {
-					confirm = prompt(`Are you sure you want to remove "${name}" ? (Y/N) `);
+					confirm = prompt(`Are you sure you want to remove "${name}" ? (Y/N): `);
 				}
 				if (confirm.toLowerCase() == 'y') {
 					delete data[name];
@@ -79,6 +79,9 @@ load().then(({ config, data, exists }) => {
 							providedPath = path.join(process.cwd(), providedPath);
 						}
 						changePath(providedPath);
+						break;
+					case 'password':
+						changePassword(prompt('Enter a new password: '));
 						break;
 				}
 				break;

@@ -38,12 +38,16 @@ function save(data, path = vaultFile) {
 	fs.writeFileSync(path, encrypt(JSON.stringify(data), key, iv));
 }
 
+function saveConfig({ masterPassword = master, encKey = enc, path = vaultFilePath }) {
+	fs.writeFileSync(configFile, masterPassword + EOL + encKey + EOL + encrypt(path, key, iv));
+}
+
 function changePath(newPath) {
 	newPath = path.join(newPath, fs.existsSync(newPath) && fs.lstatSync(newPath).isDirectory() ? 'vault' : '');
 	const log = () => console.log(`Vault is now located at ${newPath}`);
 
 	if (newPath.toLowerCase() != vaultFile.toLowerCase()) {
-		fs.writeFileSync(configFile, master + EOL + enc + EOL + encrypt(newPath, key, iv));
+		saveConfig({ path: newPath });
 		return load()
 			.then(({ data }) => save(data, newPath))
 			.then(() => {
@@ -54,4 +58,8 @@ function changePath(newPath) {
 	log();
 }
 
-module.exports = { load, save, changePath };
+function changePassword(password) {
+	saveConfig({ masterPassword: hash(password) });
+}
+
+module.exports = { load, save, changePath, changePassword };
