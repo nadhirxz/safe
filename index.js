@@ -19,6 +19,7 @@ program
 	.addOption(new Option('-t, --type <type>').choices(['text', 'account']).default('text'))
 	.option('-f, --file <filename>', 'used with add to insert a file')
 	.option('-o, --output <filename>', 'output entry instead of console log')
+	.option('-s, --safe <filename>', 'safe path')
 	.action((action, name, config) => {
 		if (action == 'config' && !configChoices.includes(name))
 			return console.log(
@@ -32,7 +33,8 @@ program
 	.parse();
 
 function run(action, name, config, type = program.opts().type) {
-	load().then(data => {
+	const safePath = program.opts().safe;
+	load({ safePath }).then(data => {
 		switch (action) {
 			case 'add': {
 				const file = program.opts().file;
@@ -50,7 +52,7 @@ function run(action, name, config, type = program.opts().type) {
 					const text = prompt('your text: ');
 					data[name] = text;
 				}
-				save(data);
+				save(data, safePath);
 				console.log('entry added successfully');
 				break;
 			}
@@ -64,7 +66,7 @@ function run(action, name, config, type = program.opts().type) {
 				}
 				if (yes.includes(confirm.toLowerCase())) {
 					delete data[name];
-					save(data);
+					save(data, safePath);
 					console.log('entry removed successfully');
 				}
 				break;
@@ -121,7 +123,7 @@ function run(action, name, config, type = program.opts().type) {
 						changePath(providedPath);
 						break;
 					case 'password':
-						changePassword(prompt('new password: '));
+						changePassword(prompt('new password: '), safePath);
 						console.log('password changed');
 						break;
 				}
@@ -146,7 +148,7 @@ function run(action, name, config, type = program.opts().type) {
 					confirm = prompt(`are you sure you want to clear the safe ? (Y/N): `);
 				}
 				if (yes.includes(confirm.toLowerCase())) {
-					clearSafe();
+					clearSafe(safePath);
 					console.log('safe cleared successfully');
 				}
 				break;
