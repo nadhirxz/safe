@@ -7,8 +7,8 @@ function hash(text, algorithm = 'sha256', salt = '') {
 function encrypt(val, key, iv) {
 	try {
 		let cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-		let encrypted = cipher.update(val, 'utf8', 'base64');
-		encrypted += cipher.final('base64');
+		let encrypted = cipher.update(val, 'utf8', 'binary');
+		encrypted += cipher.final('binary');
 		return encrypted;
 	} catch {
 		return false;
@@ -18,7 +18,7 @@ function encrypt(val, key, iv) {
 function decrypt(val, key, iv) {
 	try {
 		let decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-		let decrypted = decipher.update(val, 'base64', 'utf8');
+		let decrypted = decipher.update(val, 'binary', 'utf8');
 		return decrypted + decipher.final('utf8');
 	} catch {
 		return false;
