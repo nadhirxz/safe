@@ -7,6 +7,8 @@ const prompt = require('prompt-sync')({ sigint: true });
 
 const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
 const configChoices = ['path', 'password'];
+const yesno = ['y', 'yes', 'no', 'n'];
+const yes = ['y', 'yes'];
 
 program
 	.version('1.0.0')
@@ -57,10 +59,10 @@ function run(action, name, config, type = program.opts().type) {
 				if (!name) return console.log("argument 'name' is required");
 				if (data[name] == undefined) return console.log("entry doesn't exist");
 				let confirm = '';
-				while (!['y', 'n'].includes(confirm.toLowerCase())) {
+				while (!yesno.includes(confirm.toLowerCase())) {
 					confirm = prompt(`are you sure you want to remove "${name}" ? (Y/N): `);
 				}
-				if (confirm.toLowerCase() == 'y') {
+				if (yes.includes(confirm.toLowerCase())) {
 					delete data[name];
 					save(data);
 					console.log('entry removed successfully');
@@ -83,11 +85,11 @@ function run(action, name, config, type = program.opts().type) {
 						if (require('utf-8-validate')(buffer)) return console.log(buffer.toString());
 
 						let confirm = '';
-						while (!['y', 'n'].includes(confirm.toLowerCase())) {
+						while (!yesno.includes(confirm.toLowerCase())) {
 							confirm = prompt('this entry is a file. would you like to export it ? (Y/N): ');
 						}
 
-						if (confirm.toLowerCase() == 'y') {
+						if (yes.includes(confirm.toLowerCase())) {
 							exportFile(data[name].filename, buffer);
 						}
 					} else {
@@ -140,10 +142,10 @@ function run(action, name, config, type = program.opts().type) {
 
 			case 'clear': {
 				let confirm = '';
-				while (!['y', 'n'].includes(confirm.toLowerCase())) {
+				while (!yesno.includes(confirm.toLowerCase())) {
 					confirm = prompt(`are you sure you want to clear the vault ? (Y/N): `);
 				}
-				if (confirm.toLowerCase() == 'y') {
+				if (yes.includes(confirm.toLowerCase())) {
 					clearVault();
 					console.log('vault cleared successfully');
 				}
