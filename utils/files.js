@@ -45,8 +45,6 @@ async function load({ reset = false, safePath = null, forSave = false }) {
 }
 
 function save(data, path = getSafePath()) {
-	console.log(data);
-	console.log(JSON.stringify({ key: master, data: data || {} }));
 	fs.writeFileSync(path, encrypt(JSON.stringify({ key: master, data: data || {} }), key, iv));
 }
 
