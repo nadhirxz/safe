@@ -2,7 +2,7 @@
 const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
-const { load, save, changePath, changePassword, clearVault, checkFile, exportFile, getVaultPath } = require('./utils/files');
+const { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getSafePath } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
@@ -131,23 +131,23 @@ function run(action, name, config, type = program.opts().type) {
 			case 'list': {
 				const keys = Object.keys(data);
 				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
-				console.log('vault is empty');
+				console.log('safe is empty');
 				break;
 			}
 
 			case 'path': {
-				console.log('current path:', getVaultPath());
+				console.log('current path:', getSafePath());
 				break;
 			}
 
 			case 'clear': {
 				let confirm = '';
 				while (!yesno.includes(confirm.toLowerCase())) {
-					confirm = prompt(`are you sure you want to clear the vault ? (Y/N): `);
+					confirm = prompt(`are you sure you want to clear the safe ? (Y/N): `);
 				}
 				if (yes.includes(confirm.toLowerCase())) {
-					clearVault();
-					console.log('vault cleared successfully');
+					clearSafe();
+					console.log('safe cleared successfully');
 				}
 				break;
 			}

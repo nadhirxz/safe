@@ -1,5 +1,5 @@
 {
-	"name": "vault",
+	"name": "safe",
 	"version": "1.0.0",
 	"description": "Simple cli tool to save your secret stuff",
 	"main": "index.js",
