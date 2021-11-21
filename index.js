@@ -2,8 +2,7 @@
 const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
-const { hash } = require('./utils/encryption');
-const { load, save, changePath, changePassword, vaultFile, clearVault, exists, master, checkFile, exportFile } = require('./utils/files');
+const { load, save, changePath, changePassword, clearVault, checkFile, exportFile, getVaultPath } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
@@ -26,23 +25,11 @@ program
 					.join(', ')
 					.trim()})`
 			);
-		runAction(action, name, config);
+		run(action, name, config);
 	})
 	.parse();
 
-function runAction(action, name, config) {
-	let password = '';
-	if (exists) password = prompt('password: ', { echo: '*' });
-
-	if (!exists || hash(password) == master) {
-		run(action, name, program.opts().type, config);
-	} else {
-		console.log('wrong password');
-		runAction(action, name, config);
-	}
-}
-
-function run(action, name, type = 'text', config) {
+function run(action, name, config, type = program.opts().type) {
 	load().then(data => {
 		switch (action) {
 			case 'add': {
@@ -147,7 +134,7 @@ function run(action, name, type = 'text', config) {
 			}
 
 			case 'path': {
-				console.log('current path:', vaultFile);
+				console.log('current path:', getVaultPath());
 				break;
 			}
 
