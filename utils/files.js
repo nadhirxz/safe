@@ -9,6 +9,9 @@ const defaultSafe = path.join(homedir(), 'safe');
 
 const exists = fileHasData(configFile);
 
+const absolutePathTest = /[a-zA-Z]:\\(((?![<>:"/\\|?*]).)+((?<![ .])\\)?)*/;
+const validPathTest = /^(?!.*[\\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$/;
+
 let master, config, masterHash, iv, key;
 
 if (!exists) {
@@ -100,11 +103,11 @@ function getSafePath(safePath) {
 }
 
 function getFullSafePath(safeFilePath = getSafePath()) {
-	return path.join(safeFilePath, fs.existsSync(safeFilePath) && fs.lstatSync(safeFilePath).isDirectory() ? 'safe' : '');
+	return path.join(absolutePathTest.test(safeFilePath) ? safeFilePath : path.join(process.cwd(), safeFilePath), fs.existsSync(safeFilePath) && fs.lstatSync(safeFilePath).isDirectory() ? 'safe' : '');
 }
 
 function fileHasData(filename) {
 	return fs.existsSync(filename) && fs.statSync(filename).size != 0;
 }
 
-module.exports = { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getSafePath };
+module.exports = { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getFullSafePath, getSafePath, absolutePathTest, validPathTest };

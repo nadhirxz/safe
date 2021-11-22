@@ -2,7 +2,7 @@
 const { program, Argument, Option } = require('commander');
 const os = require('os');
 const path = require('path');
-const { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getSafePath } = require('./utils/files');
+const { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getFullSafePath, getSafePath, absolutePathTest, validPathTest } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
 
 const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
@@ -114,9 +114,9 @@ function run(action, name, config, type = program.opts().type) {
 					case 'path':
 						let providedPath = config;
 						if (!providedPath) return console.log('please provide a path');
-						const absolute = /[a-zA-Z]:\\(((?![<>:"/\\|?*]).)+((?<![ .])\\)?)*/.test(providedPath);
+						const absolute = absolutePathTest.test(providedPath);
 						if (!absolute) {
-							const validPath = /^(?!.*[\\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?:[^<>:"\|\?\*\n])+(?:\/\/|\/|\\\\|\\)?)+$/.test(providedPath);
+							const validPath = validPathTest.test(providedPath);
 							if (!validPath) return console.lod('invalid path');
 							providedPath = path.join(process.cwd(), providedPath);
 						}
@@ -138,7 +138,7 @@ function run(action, name, config, type = program.opts().type) {
 			}
 
 			case 'path': {
-				console.log('current path:', getSafePath());
+				console.log('current path:', getFullSafePath(getSafePath(safePath)));
 				break;
 			}
 
