@@ -70,7 +70,7 @@ function changePath(newPath) {
 		saveConfig(newPath);
 		saveData(newPath).then(() => {
 			fs.unlinkSync(getSafePath());
-			console.log(`new safe path: ${chalk.underline(newPath)}`);
+			console.log(`new default safe path: ${chalk.underline(newPath)}`);
 		});
 		return;
 	}
