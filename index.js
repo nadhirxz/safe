@@ -21,6 +21,7 @@ program
 	.option('-f, --file <filename>', 'used with add to insert a file')
 	.option('-o, --output <filename>', 'output entry instead of console log')
 	.option('-s, --safe <filename>', 'safe path')
+	.option('--no-color', 'no color')
 	.action((action, name, config) => {
 		if (action == 'config' && !configChoices.includes(name))
 			return console.log(
