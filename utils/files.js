@@ -3,6 +3,7 @@ const path = require('path');
 const { homedir } = require('os');
 const { hash, decrypt, encrypt } = require('./encryption');
 const prompt = require('prompt-sync')({ sigint: true });
+const chalk = require('chalk');
 
 const configFile = path.join(homedir(), 'safe-config');
 const defaultSafe = path.join(homedir(), 'safe');
@@ -15,7 +16,7 @@ const validPathTest = /^(?!.*[\\\/]\s+)(?!(?:.*\s|.*\.|\W+)$)(?:[a-zA-Z]:)?(?:(?
 let master, config, masterHash, iv, key;
 
 if (!exists) {
-	master = hash(prompt('enter a master password: ', { echo: '*' }));
+	master = hash(prompt(chalk.bold('enter a master password: '), { echo: '*' }));
 	masterHash = hash(master, 'sha512', hash(master, 'md5'));
 	[iv, key] = [masterHash.slice(0, 16), masterHash.slice(16, 48)];
 	config = {};
@@ -25,8 +26,8 @@ if (!exists) {
 
 async function load({ reset = false, safePath = null, forSave = false }) {
 	if (!forSave) {
-		if (safePath == null ? reset || (exists && fileHasData(getSafePath()) && !master) : fileHasData(getFullSafePath(safePath))) master = hash(prompt('password: ', { echo: '*' }));
-		else master = hash(prompt('enter a master password: ', { echo: '*' }));
+		if (safePath == null ? reset || (exists && fileHasData(getSafePath()) && !master) : fileHasData(getFullSafePath(safePath))) master = hash(prompt(chalk.bold('password: '), { echo: '*' }));
+		else master = hash(prompt(chalk.bold('enter a master password: '), { echo: '*' }));
 	}
 
 	masterHash = hash(master, 'sha512', hash(master, 'md5'));
@@ -40,7 +41,7 @@ async function load({ reset = false, safePath = null, forSave = false }) {
 	const safe = JSON.parse(decrypt(fs.readFileSync(safeFile, 'utf-8'), key, iv)) || {};
 
 	if (!forSave && !(safe && safe.key == master)) {
-		console.log('wrong password');
+		console.log(chalk.yellowBright('wrong password'));
 		return load({ reset: true, safePath });
 	}
 
@@ -69,11 +70,11 @@ function changePath(newPath) {
 		saveConfig(newPath);
 		saveData(newPath).then(() => {
 			fs.unlinkSync(getSafePath());
-			console.log(`new safe path: ${newPath}`);
+			console.log(`new safe path: ${chalk.underline(newPath)}`);
 		});
 		return;
 	}
-	console.log(`safe path is already ${newPath}`);
+	console.log(`safe path is already ${chalk.underline(newPath)}`);
 }
 
 function changePassword(password, safePath) {
@@ -95,7 +96,7 @@ function checkFile(filename) {
 
 function exportFile(filename, buffer) {
 	fs.writeFileSync(filename, buffer);
-	console.log('entry exported to', filename);
+	console.log('entry exported to', chalk.underline(filename));
 }
 
 function getSafePath(safePath) {

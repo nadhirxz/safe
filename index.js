@@ -4,6 +4,7 @@ const os = require('os');
 const path = require('path');
 const { load, save, changePath, changePassword, clearSafe, checkFile, exportFile, getFullSafePath, getSafePath, absolutePathTest, validPathTest } = require('./utils/files');
 const prompt = require('prompt-sync')({ sigint: true });
+const chalk = require('chalk');
 
 const actionChoices = ['add', 'remove', 'view', 'config', 'list', 'path', 'clear'];
 const configChoices = ['path', 'password'];
@@ -39,21 +40,21 @@ function run(action, name, config, type = program.opts().type) {
 			case 'add': {
 				const file = program.opts().file;
 				if (!name) return console.log("argument 'name' is required");
-				if (data.hasOwnProperty(name)) return console.log('entry already exists');
+				if (data.hasOwnProperty(name)) return console.log(chalk.yellowBright('entry already exists'));
 				if (file) {
 					const check = checkFile(file);
-					if (!check.valid) return console.log(`${file} doesn't exist`);
+					if (!check.valid) return console.log(chalk.yellowBright(`${chalk.underline(file)} doesn't exist`));
 					data[name] = { filename: file, buffer: check.file };
 				} else if (type == 'account') {
-					const username = prompt('username/email: ');
-					const password = prompt('password: ', { echo: '*' });
+					const username = prompt(chalk.bold('username/email: '));
+					const password = prompt(chalk.bold('password: '), { echo: '*' });
 					data[name] = { username, password };
 				} else {
-					const text = prompt('your text: ');
+					const text = prompt(chalk.bold('your text: '));
 					data[name] = text;
 				}
 				save(data, safePath);
-				console.log('entry added successfully');
+				console.log(chalk.bold.green('entry added successfully'));
 				break;
 			}
 
@@ -62,12 +63,12 @@ function run(action, name, config, type = program.opts().type) {
 				if (data[name] == undefined) return console.log("entry doesn't exist");
 				let confirm = '';
 				while (!yesno.includes(confirm.toLowerCase())) {
-					confirm = prompt(`are you sure you want to remove "${name}" ? (Y/N): `);
+					confirm = prompt(chalk.bold.red(`are you sure you want to remove "${name}" ? (Y/N): `));
 				}
 				if (yes.includes(confirm.toLowerCase())) {
 					delete data[name];
 					save(data, safePath);
-					console.log('entry removed successfully');
+					console.log(chalk.bold.green('entry removed successfully'));
 				}
 				break;
 			}
@@ -95,8 +96,8 @@ function run(action, name, config, type = program.opts().type) {
 							exportFile(data[name].filename, buffer);
 						}
 					} else {
-						const out = `username/email: ${data[name].username}
-						password: ${data[name].password}`;
+						const out = `${chalk.bold('username/email:')} ${data[name].username}
+						${chalk.bold('password:')} ${data[name].password}`;
 
 						if (output) return exportFile(output, Buffer.from(out, 'utf-8'));
 						console.log(out);
@@ -113,18 +114,18 @@ function run(action, name, config, type = program.opts().type) {
 				switch (name) {
 					case 'path':
 						let providedPath = config;
-						if (!providedPath) return console.log('please provide a path');
+						if (!providedPath) return console.log(chalk.yellowBright('please provide a path'));
 						const absolute = absolutePathTest.test(providedPath);
 						if (!absolute) {
 							const validPath = validPathTest.test(providedPath);
-							if (!validPath) return console.lod('invalid path');
+							if (!validPath) return console.log(chalk.yellowBright('invalid path'));
 							providedPath = path.join(process.cwd(), providedPath);
 						}
 						changePath(providedPath);
 						break;
 					case 'password':
-						changePassword(prompt('new password: '), safePath);
-						console.log('password changed');
+						changePassword(prompt(chalk.bold('new password: ')), safePath);
+						console.log(chalk.bold.green('password changed'));
 						break;
 				}
 				break;
@@ -132,24 +133,24 @@ function run(action, name, config, type = program.opts().type) {
 
 			case 'list': {
 				const keys = Object.keys(data);
-				if (keys.length) return console.log(keys.map(e => ` - ${e}`).join(os.EOL));
-				console.log('safe is empty');
+				if (keys.length) return console.log(['entry list: ', ...keys.map(e => ` - ${e}`)].join(os.EOL));
+				console.log(chalk.bold('safe is empty'));
 				break;
 			}
 
 			case 'path': {
-				console.log('current path:', getFullSafePath(getSafePath(safePath)));
+				console.log('current path:', chalk.underline(getFullSafePath(getSafePath(safePath))));
 				break;
 			}
 
 			case 'clear': {
 				let confirm = '';
 				while (!yesno.includes(confirm.toLowerCase())) {
-					confirm = prompt(`are you sure you want to clear the safe ? (Y/N): `);
+					confirm = prompt(chalk.bold.red(`are you sure you want to clear the safe ? (Y/N): `));
 				}
 				if (yes.includes(confirm.toLowerCase())) {
 					clearSafe(safePath);
-					console.log('safe cleared successfully');
+					console.log(chalk.bold.green('safe cleared successfully'));
 				}
 				break;
 			}
